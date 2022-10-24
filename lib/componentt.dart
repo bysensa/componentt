@@ -106,7 +106,7 @@ mixin ComponentMixin<T extends StatefulWidget> on State<T> {
     super.dispose();
   }
 
-  Widget wrap(Widget child, {Set<Action>? actions}) {
+  Widget component({required Widget child, Set<Action>? actions}) {
     final allActions = {
       ..._actions,
       if (actions != null) ...{
