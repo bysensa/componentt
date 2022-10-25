@@ -1,5 +1,7 @@
 library componentt;
 
+import 'dart:collection';
+
 import 'package:flutter/widgets.dart';
 
 typedef ComponentActionHandler<T extends Intent, R extends Object?> = R
@@ -83,6 +85,19 @@ class ComponentAction<T extends Intent, R extends Object?>
   }
 }
 
+extension ActionHandlerExt<T extends Intent, R extends Object?>
+    on ComponentActionHandler<T, R> {
+  ComponentAction<T, R> toAction({
+    ComponentActionPredicate<T>? enabledPredicate,
+    ComponentActionPredicate<T>? consumesKeyPredicate,
+  }) =>
+      ComponentAction<T, R>(
+        this,
+        enabledPredicate: enabledPredicate,
+        consumesKeyPredicate: consumesKeyPredicate,
+      );
+}
+
 extension ComponentActionExt<T extends ComponentAction> on T {
   T attachTo(ComponentMixin component) {
     component._actions[intentType] = this;
@@ -100,21 +115,29 @@ mixin ComponentMixin<T extends StatefulWidget> on State<T> {
 
   ActionDispatcher get actionDispatcher => const ActionDispatcher();
 
+  Map<Type, Action<Intent>> get actions => UnmodifiableMapView(_actions);
+
   @override
   void dispose() {
     _actions.clear();
     super.dispose();
   }
 
-  Widget component({required Widget child, Set<Action>? actions}) {
-    final allActions = {
-      ..._actions,
-      if (actions != null) ...{
-        for (final action in actions) action.intentType: action
-      },
-    };
+  @override
+  void setState(VoidCallback fn) {
+    assert(
+      false,
+      'The setState method must not be used in class which extends Component or mix ComponentMixin. '
+      'Please use other primitives for this purpose like'
+      'ChangeNotifier, ValueNotifier or Stream',
+    );
+    super.setState(fn);
+  }
+
+  Widget withActions({required Widget child, Key? key}) {
     return Actions(
-      actions: allActions,
+      key: key,
+      actions: Map.unmodifiable(_actions),
       dispatcher: actionDispatcher,
       child: child,
     );

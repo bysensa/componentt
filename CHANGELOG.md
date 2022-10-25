@@ -1,3 +1,6 @@
-## 0.0.1
+## 0.1.0
 
-* TODO: Describe initial release.
+* [FEAT] Implement ComponentAction API
+* [FEAT] Implement ComponentMixin API necessary to use ComponentActions
+* [FEAT] Implement extensions for BuildContext, ComponentAction and Component 
+  handler function
