@@ -1,0 +1,55 @@
+import 'package:componentt/componentt.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+class TestIntent extends Intent {}
+
+void handler(TestIntent intent, [BuildContext? context]) {}
+
+void main() {
+  test("should create action", () {
+    expect(handler.action, isNull);
+    final action = handler.toAction();
+    expect(action, handler.action);
+  });
+
+  test("should be same action instance", () {
+    expect(handler.toAction(), handler.toAction());
+  });
+
+  testWidgets("should create widget", (tester) async {
+    var widgets = [TestWidget(), SizedBox.shrink()];
+    await tester.pumpWidget(widgets.removeAt(0));
+    await tester.pumpAndSettle();
+    expect(find.byType(TestWidget), findsOneWidget);
+    await tester.pumpWidget(widgets.removeAt(0));
+    await tester.pumpAndSettle();
+  });
+}
+
+class TestWidget extends StatefulWidget {
+  const TestWidget({Key? key}) : super(key: key);
+
+  @override
+  State<TestWidget> createState() => _TestWidgetState();
+}
+
+class _TestWidgetState extends Component<TestWidget> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print(hashCode);
+  }
+
+  void handler(TestIntent intent, [BuildContext? context]) {}
+
+  @override
+  Widget build(BuildContext context) {
+    print(hashCode);
+    return withActions(
+      actions: {handler.toAction()},
+      child: const Placeholder(),
+    );
+  }
+}

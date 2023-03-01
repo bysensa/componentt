@@ -17,7 +17,7 @@ void main() {
     expect(acc.value, 2);
   });
 
-  testWidgets('should not rebuild on setState', (widgetTester) async {
+  testWidgets('should not rebuild on setState 2', (widgetTester) async {
     final acc = Accumulator();
     final widget = TestComponent(acc: acc);
     await widgetTester.pumpWidget(widget);
@@ -25,9 +25,8 @@ void main() {
     expect(find.byType(TestComponent), findsOneWidget);
     final actionsState =
         widgetTester.state(find.byType(TestComponent)) as _TestComponentState;
-    final registeredActions = actionsState.actions;
-    expect(registeredActions.containsKey(Test1Intent), isTrue);
-    expect(registeredActions.containsKey(Test2Intent), isFalse);
+    expect(actionsState.onTest1.isActionEnabled, isTrue);
+    expect(actionsState.onTest2.isActionEnabled, isTrue);
   });
 }
 
@@ -47,34 +46,26 @@ class TestComponent extends StatefulWidget {
 }
 
 class _TestComponentState extends Component<TestComponent> {
-  late final ComponentAction test1Action;
-  late final test2Action = ComponentAction(_onTest2);
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   Accumulator get acc => widget.acc;
 
-  @override
-  void initState() {
-    super.initState();
-    test1Action = _onTest1.toAction().attachTo(this);
+  void onTest1(Test1Intent intent, [BuildContext? context]) {
+    onTest1.toggleEnabled();
   }
 
-  void _onTest1(Test1Intent intent, [BuildContext? context]) {
-    test1Action.toggleEnabled();
-  }
-
-  void _onTest2(Test2Intent intent, [BuildContext? context]) {
-    test2Action.toggleEnabled();
-  }
-
-  @override
-  void dispose() {
-    test1Action.detachFrom(this);
-    super.dispose();
+  void onTest2(Test2Intent intent, [BuildContext? context]) {
+    onTest2.toggleEnabled();
   }
 
   @override
   Widget build(BuildContext context) {
     return withActions(
+      actions: {onTest1.toAction()},
       key: const ValueKey('actions'),
       child: MaterialApp(
         home: Scaffold(

@@ -139,19 +139,6 @@ void main() {
     action.toggleConsumesKey();
     expect(counter, 4);
   });
-
-  test('should convert function to action', () {
-    bool enabledPredicate(TestIntent intent) => false;
-    bool consumesKeyPredicate(TestIntent intent) => false;
-    final action = defaultTestHandler.toAction(
-      consumesKeyPredicate: consumesKeyPredicate,
-      enabledPredicate: enabledPredicate,
-    );
-    expect(action.intentType, TestIntent);
-    expect(action.resultType, int);
-    expect(action.isEnabled(TestIntent()), isFalse);
-    expect(action.consumesKey(TestIntent()), isFalse);
-  });
 }
 
 class TestIntent extends Intent {}

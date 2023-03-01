@@ -35,18 +35,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends Component<MyHomePage> {
   final _maxValue = 15;
   final _counter = ValueNotifier(0);
-  late final ComponentAction<IncrementIntent, void> _incrementAction;
-
-  @override
-  void initState() {
-    super.initState();
-    _incrementAction = _onIncrement.toAction().attachTo(this);
-  }
 
   void _onIncrement(IncrementIntent intent, [BuildContext? context]) {
     _counter.value += 1;
     if (_counter.value == _maxValue) {
-      _incrementAction.isActionEnabled = false;
+      _onIncrement.isActionEnabled = false;
       if (context != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -60,6 +53,7 @@ class _MyHomePageState extends Component<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return withActions(
+      actions: {_onIncrement.toAction()},
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
