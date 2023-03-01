@@ -9,12 +9,11 @@ void handler(TestIntent intent, [BuildContext? context]) {}
 void main() {
   test("should create action", () {
     expect(handler.action, isNull);
-    final action = handler.toAction();
-    expect(action, handler.action);
+    final action = handler.action();
   });
 
   test("should be same action instance", () {
-    expect(handler.toAction(), handler.toAction());
+    expect(handler.action(), handler.action());
   });
 
   testWidgets("should create widget", (tester) async {
@@ -48,7 +47,7 @@ class _TestWidgetState extends Component<TestWidget> {
   Widget build(BuildContext context) {
     print(hashCode);
     return withActions(
-      actions: {handler.toAction()},
+      actions: {handler.action()},
       child: const Placeholder(),
     );
   }

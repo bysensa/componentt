@@ -1,80 +1,71 @@
 part of "../componentt.dart";
 
-/// Type definition of predicate for [ComponentAction]<T>
-typedef ComponentActionPredicate<T extends Intent> = bool Function(T);
-
 class ComponentAction<T extends Intent, R extends Object?>
     extends ContextAction<T> {
   final ActionHandlerFn<T, R> _handler;
-  final ComponentActionPredicate<T>? _enabledPredicate;
-  final ComponentActionPredicate<T>? _consumesKeyPredicate;
-  bool _enabled = true;
-  bool _consumesKey = true;
+  final ActionControl _control;
 
-  ComponentAction(
+  // collection to store listeners of action. this collection need to correctly
+  // add and remove listeners of control
+  final Set<Object> _listeners = {};
+
+  ComponentAction._(
     this._handler, {
-    ComponentActionPredicate<T>? enabledPredicate,
-    ComponentActionPredicate<T>? consumesKeyPredicate,
+    ActionControl? control,
   })  : assert(
           T != Never,
           "Wrong handler first parameter Type. Please ensure first parameter type extends Intent",
         ),
-        _enabledPredicate = enabledPredicate,
-        _consumesKeyPredicate = consumesKeyPredicate;
+        _control = control ?? ActionControl._();
 
   Type get resultType => R;
 
   @override
-  bool get isActionEnabled => _enabled;
-
-  set isActionEnabled(bool newValue) {
-    final shouldNotify = _enabled != newValue;
-    _enabled = newValue;
-    if (shouldNotify) {
-      notifyActionListeners();
-    }
-  }
-
-  void toggleEnabled() {
-    _enabled = !_enabled;
-    notifyActionListeners();
-  }
+  bool get isActionEnabled => _control.isActionEnabled;
 
   @override
   bool isEnabled(T intent) {
-    if (_enabledPredicate == null) {
-      return _enabled;
-    }
-    return _enabled && _enabledPredicate!(intent);
-  }
-
-  bool get isConsumesKey => _consumesKey;
-
-  set isConsumesKey(bool newValue) {
-    final shouldNotify = _consumesKey != newValue;
-    _consumesKey = newValue;
-    if (shouldNotify) {
-      notifyActionListeners();
-    }
-  }
-
-  void toggleConsumesKey() {
-    _consumesKey = !_consumesKey;
-    notifyActionListeners();
+    return _control.isEnabled(intent);
   }
 
   @override
   bool consumesKey(T intent) {
-    if (_consumesKeyPredicate == null) {
-      return _consumesKey;
-    }
-    return _consumesKey && _consumesKeyPredicate!(intent);
+    return _control.consumesKey(intent);
   }
 
   @override
   R invoke(T intent, [BuildContext? context]) => _handler(intent, context);
 
-  void notify() {
+  // notify action listeners then control is changed
+  void _controlListener() {
     notifyActionListeners();
+  }
+
+  @override
+  void addActionListener(ActionListenerCallback listener) {
+    // check there are  no listeners
+    final shouldSubscribeOnControl = _listeners.isEmpty;
+    // add listener to action
+    super.addActionListener(listener);
+    // store added listener internally
+    _listeners.add(listener);
+    // if there are no listeners before add than add listener to control
+    if (shouldSubscribeOnControl) {
+      _control.addIsEnabledListener(_controlListener);
+      _control.addIsEnabledListener(_controlListener);
+    }
+  }
+
+  @override
+  void removeActionListener(ActionListenerCallback listener) {
+    // remove listener from action
+    super.removeActionListener(listener);
+    // remove listener from internal collection
+    _listeners.remove(listener);
+    // if internal collection of listeners is empty then we can remove listener from control
+    if (_listeners.isEmpty) {
+      _control.removeIsEnabledListener(_controlListener);
+      _control.removeIsConsumesKeyListener(_controlListener);
+    }
   }
 }

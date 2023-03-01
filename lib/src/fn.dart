@@ -4,36 +4,23 @@ part of "../componentt.dart";
 typedef ActionHandlerFn<T extends Intent, R extends Object?> = R
     Function(T intent, [BuildContext? context]);
 
-final _actionStore = Expando();
-
 extension ActionHandlerFnExt<T extends Intent, R extends Object?>
     on ActionHandlerFn<T, R> {
-  @visibleForTesting
-  ComponentAction<T, R>? get action => _storedAction;
-
+  /// Return [Type] of handler intent
   Type get intentType => T;
 
-  ComponentAction<T, R> toAction() {
-    var action = _storedAction;
-    if (action == null) {
-      action = ComponentAction<T, R>(
-        this,
-        enabledPredicate: null,
-        consumesKeyPredicate: null,
-      );
-
-      _storedAction = action;
-    }
-    return action;
+  /// Return [ComponentAction]<T,R> with this function as invoke handler
+  ComponentAction<T, R> action([ActionControl<T>? control]) {
+    return ComponentAction<T, R>._(this, control: control);
   }
 
-  ComponentAction<T, R>? get _storedAction {
-    print('get: this.hashcode = ${this.hashCode}');
-    return _actionStore[this] as ComponentAction<T, R>?;
-  }
-
-  set _storedAction(ComponentAction<T, R>? newValue) {
-    print('set: this.hashcode = ${this.hashCode}');
-    _actionStore[this] = newValue;
+  ActionControl<T> control({
+    bool isEnabled = true,
+    bool isConsumesKey = true,
+  }) {
+    return ActionControl<T>._(
+      isConsumesKey: isConsumesKey,
+      isEnabled: isEnabled,
+    );
   }
 }
