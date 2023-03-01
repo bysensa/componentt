@@ -5,8 +5,6 @@ void main() {
   runApp(const MyApp());
 }
 
-class IncrementIntent extends Intent {}
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -18,75 +16,63 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const SampleWidget(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class SampleWidget extends StatefulWidget {
+  const SampleWidget({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<SampleWidget> createState() => _SampleWidgetState();
 }
 
-class _MyHomePageState extends Component<MyHomePage> {
-  final _maxValue = 15;
-  final _counter = ValueNotifier(0);
-  late final incrementControl = _onIncrement.control();
+class IncrementIntent extends Intent {}
+
+class _SampleWidgetState extends Component<SampleWidget> {
+  late final ValueNotifier<int> _count;
+
+  @override
+  void initState() {
+    super.initState();
+    _count = ValueNotifier(0);
+  }
+
+  @override
+  void dispose() {
+    _count.dispose();
+    super.dispose();
+  }
 
   void _onIncrement(IncrementIntent intent, [BuildContext? context]) {
-    _counter.value += 1;
-    if (_counter.value == _maxValue) {
-      incrementControl.isActionEnabled = false;
-      if (context != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('You reach count limit equal to $_maxValue'),
-          ),
-        );
-      }
-    }
+    _count.value += 1;
   }
 
   @override
   Widget build(BuildContext context) {
     return withActions(
-      actions: {_onIncrement.action(incrementControl)},
+      actions: {_onIncrement.action()},
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ValueListenableBuilder(
+              valueListenable: _count,
+              builder: (context, value, child) => Text('$value'),
+            ),
+            const Divider(color: Colors.transparent),
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: context.handler(IncrementIntent()),
+                  child: const Text('Increment'),
+                );
+              },
+            )
+          ],
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text('You have pushed the button this many times:'),
-              Text('Button become disabled when counter reach $_maxValue.'),
-              ValueListenableBuilder(
-                  valueListenable: _counter,
-                  builder: (context, value, child) {
-                    return Text(
-                      '$value',
-                      style: Theme.of(context).textTheme.headline4,
-                    );
-                  }),
-            ],
-          ),
-        ),
-        floatingActionButton: Builder(
-          builder: (context) {
-            final handler = context.handler(IncrementIntent());
-            return FloatingActionButton(
-              onPressed: handler,
-              tooltip: 'Increment',
-              disabledElevation: 0,
-              child: const Icon(Icons.add),
-            );
-          },
-        ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );
   }
