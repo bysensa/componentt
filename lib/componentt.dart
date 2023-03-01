@@ -1,7 +1,5 @@
 library componentt;
 
-import 'dart:collection';
-
 import 'package:flutter/widgets.dart';
 
 part 'src/fn.dart';

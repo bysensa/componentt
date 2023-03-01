@@ -9,7 +9,7 @@ void handler(TestIntent intent, [BuildContext? context]) {}
 void main() {
   test("should create action", () {
     expect(handler.action, isNull);
-    final action = handler.action();
+    final _ = handler.action();
   });
 
   test("should be same action instance", () {
@@ -17,7 +17,7 @@ void main() {
   });
 
   testWidgets("should create widget", (tester) async {
-    var widgets = [TestWidget(), SizedBox.shrink()];
+    var widgets = [const TestWidget(), const SizedBox.shrink()];
     await tester.pumpWidget(widgets.removeAt(0));
     await tester.pumpAndSettle();
     expect(find.byType(TestWidget), findsOneWidget);
@@ -38,14 +38,12 @@ class _TestWidgetState extends Component<TestWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print(hashCode);
   }
 
   void handler(TestIntent intent, [BuildContext? context]) {}
 
   @override
   Widget build(BuildContext context) {
-    print(hashCode);
     return withActions(
       actions: {handler.action()},
       child: const Placeholder(),
