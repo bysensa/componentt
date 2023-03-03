@@ -9,3 +9,7 @@
 
 * [REFACTORING] make API more user friendly
 * [CHORE] update documentation
+
+## 0.2.1
+
+* [REFACTORING] add dispose method for ActionControl

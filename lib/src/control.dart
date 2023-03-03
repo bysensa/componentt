@@ -80,4 +80,9 @@ class ActionControl<T extends Intent> {
     }
     return isConsumesKey && _consumesKeyPredicate!(intent);
   }
+
+  void dispose() {
+    _isEnabled.dispose();
+    _isConsumesKey.dispose();
+  }
 }
