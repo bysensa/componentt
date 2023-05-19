@@ -17,3 +17,4 @@
 ## 0.3.0
 
 * [FEAT] implement API to access ComponentMixin through BuildContext
+* [CHORE] update upper bound of Dart SDK version in pubspec.yaml
