@@ -22,6 +22,7 @@ mixin ComponentMixin<T extends StatefulWidget> on State<T> {
     super.setState(fn);
   }
 
+  /// Provides [ComponentAction]'s and this successor of [ComponentMixin] through [BuildContext]
   Widget withActions({
     required Widget child,
     Key? key,
@@ -30,11 +31,14 @@ mixin ComponentMixin<T extends StatefulWidget> on State<T> {
     final resolvedActions = {
       for (final action in actions) action.intentType: action
     };
-    return Actions(
-      key: key,
-      actions: resolvedActions,
-      dispatcher: actionDispatcher,
-      child: child,
+    return _ComponentScope(
+      component: this,
+      child: Actions(
+        key: key,
+        actions: resolvedActions,
+        dispatcher: actionDispatcher,
+        child: child,
+      ),
     );
   }
 }

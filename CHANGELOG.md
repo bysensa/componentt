@@ -13,3 +13,7 @@
 ## 0.2.1
 
 * [REFACTORING] add dispose method for ActionControl
+
+## 0.3.0
+
+* [FEAT] implement API to access ComponentMixin through BuildContext

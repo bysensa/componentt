@@ -7,3 +7,4 @@ part 'src/action.dart';
 part 'src/context.extension.dart';
 part 'src/component.dart';
 part 'src/control.dart';
+part 'src/scope.dart';

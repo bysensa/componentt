@@ -1,4 +1,5 @@
 import 'package:componentt/componentt.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -30,8 +31,10 @@ class SampleWidget extends StatefulWidget {
 
 class IncrementIntent extends Intent {}
 
-class _SampleWidgetState extends Component<SampleWidget> {
+mixin _ViewModel on Component<SampleWidget> {
   late final ValueNotifier<int> _count;
+
+  ValueListenable<int> get count => _count;
 
   @override
   void initState() {
@@ -48,32 +51,99 @@ class _SampleWidgetState extends Component<SampleWidget> {
   void _onIncrement(IncrementIntent intent, [BuildContext? context]) {
     _count.value += 1;
   }
+}
 
+class _SampleWidgetState extends Component<SampleWidget> with _ViewModel {
   @override
   Widget build(BuildContext context) {
     return withActions(
       actions: {_onIncrement.action()},
-      child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ValueListenableBuilder(
-              valueListenable: _count,
-              builder: (context, value, child) => Text('$value'),
-            ),
-            const Divider(color: Colors.transparent),
-            Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: context.handler(IncrementIntent()),
-                  child: const Text('Increment'),
-                );
-              },
-            )
-          ],
-        ),
+      child: const _Layout(
+        count: _Count(),
+        evenOrOdd: _EventOddMark(),
+        button: _IncrementButton(),
       ),
+    );
+  }
+}
+
+class _Layout extends StatelessWidget {
+  final Widget count;
+  final Widget evenOrOdd;
+  final Widget button;
+
+  const _Layout({
+    Key? key,
+    required this.count,
+    required this.evenOrOdd,
+    required this.button,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          count,
+          evenOrOdd,
+          const Divider(color: Colors.transparent),
+          button,
+        ],
+      ),
+    );
+  }
+}
+
+class _Count extends StatelessWidget {
+  const _Count({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _SampleWidgetState component = context.component();
+
+    return ValueListenableBuilder<int>(
+      valueListenable: component.count,
+      builder: (context, value, child) {
+        return Text('$value');
+      },
+    );
+  }
+}
+
+class _EventOddMark extends StatelessWidget {
+  static const _evenText = 'Even';
+  static const _oddText = 'Odd';
+
+  const _EventOddMark({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _ViewModel viewModel = context.component();
+
+    const even = Text(_evenText);
+    const odd = Text(_oddText);
+
+    return ValueListenableBuilder<int>(
+      valueListenable: viewModel.count,
+      builder: (context, value, child) => Visibility(
+        visible: value % 2 == 0,
+        replacement: odd,
+        child: even,
+      ),
+    );
+  }
+}
+
+class _IncrementButton extends StatelessWidget {
+  const _IncrementButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: context.handler(IncrementIntent()),
+      child: const Text('Increment'),
     );
   }
 }

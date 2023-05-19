@@ -75,4 +75,38 @@ extension BuildContextExtension on BuildContext {
   /// ```
   Object? maybeInvoke<T extends Intent>(T intent) =>
       Actions.maybeInvoke<T>(this, intent);
+
+  /// Provides nearest successor of [ComponentMixin]
+  ///
+  /// Generic parameter [C] allow downcast to concrete implementation. For example
+  /// you can implement some class for successor of [ComponentMixin] and after
+  /// get this successor downcasted to [C] in child widget.
+  ///
+  /// Example:
+  /// ```dart
+  /// mixin ViewModel on Component<ExampleWidget> {
+  ///   int get count => 0;
+  /// }
+  ///
+  /// class ExampleState extends Component<ExampleWidget> with ViewModel {
+  ///   //some implementation here
+  ///
+  ///   Widget build(BuildContext context) {
+  ///     return withActions(
+  ///       child: const ExampleSubView(),
+  ///     );
+  ///   }
+  /// }
+  ///
+  /// class ExampleSubView extends StatelessWidget {
+  /// @override
+  ///   Widget build(BuildContext context) {
+  ///     final ViewModel vm = context.component();
+  ///
+  ///     return Text('${vm.count}');
+  ///   }
+  /// }
+  /// ```
+  C component<C extends ComponentMixin>() =>
+      _ComponentScope.componentOf<C>(this);
 }
