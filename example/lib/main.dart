@@ -22,16 +22,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SampleWidget extends StatefulWidget {
+class SampleWidget extends ComponentWidget {
   const SampleWidget({Key? key}) : super(key: key);
 
   @override
-  State<SampleWidget> createState() => _SampleWidgetState();
+  ComponentState<SampleWidget> createState() => _SampleWidgetState();
 }
 
 class IncrementIntent extends Intent {}
 
-mixin _ViewModel on Component<SampleWidget> {
+class NotifyIntent extends Intent {
+  final String text;
+
+  const NotifyIntent(this.text);
+}
+
+mixin _ViewModel on ComponentState<SampleWidget> {
   late final ValueNotifier<int> _count;
 
   ValueListenable<int> get count => _count;
@@ -48,16 +54,33 @@ mixin _ViewModel on Component<SampleWidget> {
     super.dispose();
   }
 
-  void _onIncrement(IncrementIntent intent, [BuildContext? context]) {
+  @override
+  Set<Action<Intent>> get actions => {
+        _onIncrement.action(),
+        onNotify.action(),
+      };
+
+  void _onIncrement(IncrementIntent intent) {
     _count.value += 1;
+  }
+
+  void onNotify(NotifyIntent intent, [BuildContext? context]) {
+    ScaffoldMessenger.of(context!).showSnackBar(
+      SnackBar(
+        duration: const Duration(milliseconds: 200),
+        content: Text(
+          intent.text,
+        ),
+      ),
+    );
   }
 }
 
-class _SampleWidgetState extends Component<SampleWidget> with _ViewModel {
+class _SampleWidgetState extends ComponentState<SampleWidget> with _ViewModel {
   @override
   Widget build(BuildContext context) {
     return withActions(
-      actions: {_onIncrement.action()},
+      actions: {_onIncrement.action(), onNotify.action()},
       child: const _Layout(
         count: _Count(),
         evenOrOdd: _EventOddMark(),
@@ -106,6 +129,13 @@ class _Count extends StatelessWidget {
     return ValueListenableBuilder<int>(
       valueListenable: component.count,
       builder: (context, value, child) {
+        // Notify if value is odd
+        if (value % 2 == 0) {
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            context.invoke(NotifyIntent('Value $value is odd'));
+          });
+        }
+
         return Text('$value');
       },
     );

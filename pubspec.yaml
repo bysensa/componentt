@@ -1,6 +1,6 @@
 name: componentt
-description: A library for creating fully functional visual components.
-version: 0.3.0
+description: A library to simplify working with the intents, actions, and state of a component
+version: 0.4.0
 repository: https://github.com/bysensa/componentt
 
 environment:

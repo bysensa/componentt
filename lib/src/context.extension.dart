@@ -76,19 +76,19 @@ extension BuildContextExtension on BuildContext {
   Object? maybeInvoke<T extends Intent>(T intent) =>
       Actions.maybeInvoke<T>(this, intent);
 
-  /// Provides nearest successor of [ComponentMixin]
+  /// Provides nearest successor of [ComponentStateMixin]
   ///
   /// Generic parameter [C] allow downcast to concrete implementation. For example
-  /// you can implement some class for successor of [ComponentMixin] and after
+  /// you can implement some class for successor of [ComponentStateMixin] and after
   /// get this successor downcasted to [C] in child widget.
   ///
   /// Example:
   /// ```dart
-  /// mixin ViewModel on Component<ExampleWidget> {
+  /// mixin ViewModel on ComponentState<ExampleWidget> {
   ///   int get count => 0;
   /// }
   ///
-  /// class ExampleState extends Component<ExampleWidget> with ViewModel {
+  /// class ExampleState extends ComponentState<ExampleWidget> with ViewModel {
   ///   //some implementation here
   ///
   ///   Widget build(BuildContext context) {
@@ -107,6 +107,6 @@ extension BuildContextExtension on BuildContext {
   ///   }
   /// }
   /// ```
-  C component<C extends ComponentMixin>() =>
+  C component<C extends ComponentStateMixin>() =>
       _ComponentScope.componentOf<C>(this);
 }

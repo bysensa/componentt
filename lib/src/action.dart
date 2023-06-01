@@ -34,7 +34,13 @@ class ComponentAction<T extends Intent, R extends Object?>
   }
 
   @override
-  R invoke(T intent, [BuildContext? context]) => _handler(intent, context);
+  R invoke(T intent, [BuildContext? context]) {
+    if (_handler.hasContextParameter) {
+      final handlerWithContext = _handler as ActionHandlerWithContextFn<T, R>;
+      return handlerWithContext(intent, context);
+    }
+    return _handler(intent);
+  }
 
   // notify action listeners then control is changed
   void _controlListener() {
@@ -52,7 +58,7 @@ class ComponentAction<T extends Intent, R extends Object?>
     // if there are no listeners before add than add listener to control
     if (shouldSubscribeOnControl) {
       _control.addIsEnabledListener(_controlListener);
-      _control.addIsEnabledListener(_controlListener);
+      _control.addIsConsumesKeyListener(_controlListener);
     }
   }
 

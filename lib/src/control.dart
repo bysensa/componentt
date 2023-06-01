@@ -4,8 +4,8 @@ part of "../componentt.dart";
 typedef IntentPredicate<T extends Intent> = bool Function(T);
 
 class ActionControl<T extends Intent> {
-  final ValueNotifier<bool> _isEnabled;
-  final ValueNotifier<bool> _isConsumesKey;
+  final _Flag _isEnabled;
+  final _Flag _isConsumesKey;
 
   Type get intentType => T;
 
@@ -24,8 +24,14 @@ class ActionControl<T extends Intent> {
   ActionControl._({
     bool isEnabled = true,
     bool isConsumesKey = true,
-  })  : _isEnabled = ValueNotifier(isEnabled),
-        _isConsumesKey = ValueNotifier(isConsumesKey);
+  })  : _isEnabled = _Flag(isEnabled),
+        _isConsumesKey = _Flag(isConsumesKey);
+
+  @visibleForTesting
+  bool get hasIsEnabledListeners => _isEnabled.isListening;
+
+  @visibleForTesting
+  bool get hasIsConsumesKeyListeners => _isConsumesKey.isListening;
 
   void addIsEnabledListener(VoidCallback listener) {
     _isEnabled.addListener(listener);
@@ -85,4 +91,10 @@ class ActionControl<T extends Intent> {
     _isEnabled.dispose();
     _isConsumesKey.dispose();
   }
+}
+
+class _Flag = ValueNotifier<bool> with _FlagMixin;
+
+mixin _FlagMixin on ValueNotifier<bool> {
+  bool get isListening => hasListeners;
 }

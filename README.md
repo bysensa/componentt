@@ -31,7 +31,7 @@ quite rough. This library provides a set of methods and primitives to
 simplify the use of Intent and Action in an application. 
 
 The first thing to do is to add library import and replace inheritance from 
-State with inheritance from Component 
+State with inheritance from ComponentState 
 
 ```dart
 import 'package:componentt/componentt.dart';
@@ -43,7 +43,7 @@ class SampleWidget extends StatefulWidget {
   State<SampleWidget> createState() => _SampleWidgetState();
 }
 
-class _SampleWidgetState extends Component<SampleWidget> {
+class _SampleWidgetState extends ComponentState<SampleWidget> {
   @override
   Widget build(BuildContext context) {
     return const Placeholder();
@@ -65,7 +65,7 @@ class SampleWidget extends StatefulWidget {
 
 class IncrementIntent extends Intent {}
 
-class _SampleWidgetState extends Component<SampleWidget> {
+class _SampleWidgetState extends ComponentState<SampleWidget> {
   @override
   Widget build(BuildContext context) {
     return const Placeholder();
@@ -89,7 +89,7 @@ class SampleWidget extends StatefulWidget {
 
 class IncrementIntent extends Intent {}
 
-class _SampleWidgetState extends Component<SampleWidget> {
+class _SampleWidgetState extends ComponentState<SampleWidget> {
   late final ValueNotifier<int> _count;
 
   @override
@@ -126,7 +126,7 @@ class (`handler`, `invoke`, `maybeInvoke`) is called.
 
 We already have a handler and an Intent, now it remains to create an `Action` 
 and make it available for calling in child widgets. To do this, we use the 
-`withActions` method of the `Component` class, in the named parameter of which 
+`withActions` method of the `ComponentState` class, in the named parameter of which 
 we will pass a collection of instances of the `ComponentAction` class received 
 through the `action` extension method.
 
@@ -142,7 +142,7 @@ class SampleWidget extends StatefulWidget {
 
 class IncrementIntent extends Intent {}
 
-class _SampleWidgetState extends Component<SampleWidget> {
+class _SampleWidgetState extends ComponentState<SampleWidget> {
   late final ValueNotifier<int> _count;
 
   @override
@@ -200,7 +200,68 @@ extension of the `BuildContext` class that makes the main methods of the
 In principle, this is all you need to do to start using the Intent and 
 Action in your application. 
 
-The rest of the library's features will be discussed later. 
+An alternative way to create the component shown in the examples above is as follows:
+
+```dart
+import 'package:componentt/componentt.dart';
+
+class SampleWidget extends ComponentWidget {
+  const SampleWidget({Key? key}) : super(key: key);
+
+  @override
+  ComponentState<SampleWidget> createState() => _SampleWidgetState();
+}
+
+class IncrementIntent extends Intent {}
+
+class _SampleWidgetState extends ComponentState<SampleWidget> {
+  late final ValueNotifier<int> _count;
+
+  Set<Action<Intent>> get actions => {_onIncrement.action()};
+
+  @override
+  void initState() {
+    super.initState();
+    _count = ValueNotifier(0);
+  }
+
+  @override
+  void dispose() {
+    _count.dispose();
+    super.dispose();
+  }
+
+  void _onIncrement(IncrementIntent intent, [BuildContext? context]) {
+    _count.value += 1;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ValueListenableBuilder(
+            valueListenable: _count,
+            builder: (context, value, child) => Text('$value'),
+          ),
+          const Divider(color: Colors.transparent),
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: context.handler(IncrementIntent()),
+                child: const Text('Increment'),
+              );
+            },
+          )
+        ],
+      ),
+    );
+  }
+}
+
+```
 
 ## Additional information
 

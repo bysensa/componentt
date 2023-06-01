@@ -1,13 +1,19 @@
 part of "../componentt.dart";
 
 /// Type definition of [Action] invoke handler
-typedef ActionHandlerFn<T extends Intent, R extends Object?> = R
+typedef ActionHandlerFn<T extends Intent, R extends Object?> = R Function(
+    T intent);
+
+typedef ActionHandlerWithContextFn<T extends Intent, R extends Object?> = R
     Function(T intent, [BuildContext? context]);
 
 extension ActionHandlerFnExt<T extends Intent, R extends Object?>
     on ActionHandlerFn<T, R> {
   /// Return [Type] of handler intent
   Type get intentType => T;
+
+  /// Check that handler has context parameter
+  bool get hasContextParameter => this is ActionHandlerWithContextFn<T, R>;
 
   /// Return [ComponentAction]<T,R> with this function as invoke handler
   ComponentAction<T, R> action([ActionControl<T>? control]) {
