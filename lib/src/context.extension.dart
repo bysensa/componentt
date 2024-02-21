@@ -12,8 +12,7 @@ extension BuildContextExtension on BuildContext {
   /// ```dart
   /// VoidCallback? handler = context.handler(SomeIntent());
   /// ```
-  VoidCallback? handler<T extends Intent>(T intent) =>
-      Actions.handler<T>(this, intent);
+  VoidCallback? handler<T extends Intent>(T intent) => Actions.handler<T>(this, intent);
 
   /// Finds the Action bound to the given intent type T in the given context.
   ///
@@ -73,8 +72,7 @@ extension BuildContextExtension on BuildContext {
   /// ```dart
   /// Object? maybeResult = context.maybeInvoke(SomeIntent());
   /// ```
-  Object? maybeInvoke<T extends Intent>(T intent) =>
-      Actions.maybeInvoke<T>(this, intent);
+  Object? maybeInvoke<T extends Intent>(T intent) => Actions.maybeInvoke<T>(this, intent);
 
   /// Provides nearest successor of [ComponentStateMixin]
   ///
@@ -107,6 +105,9 @@ extension BuildContextExtension on BuildContext {
   ///   }
   /// }
   /// ```
-  C component<C extends ComponentStateMixin>() =>
-      _ComponentScope.componentOf<C>(this);
+  C component<C extends ComponentStateMixin>() => _ComponentScope.componentOf<C>(this);
+
+  C read<C extends Object>() => _ComponentScope.read<C>(this);
+
+  C listen<C extends Object>() => _ComponentScope.read<C>(this);
 }

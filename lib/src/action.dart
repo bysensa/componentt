@@ -1,7 +1,6 @@
 part of "../componentt.dart";
 
-class ComponentAction<T extends Intent, R extends Object?>
-    extends ContextAction<T> {
+class ComponentAction<T extends Intent, R extends Object?> extends ContextAction<T> {
   final ActionHandlerFn<T, R> _handler;
   final ActionControl _control;
 
@@ -24,7 +23,7 @@ class ComponentAction<T extends Intent, R extends Object?>
   bool get isActionEnabled => _control.isActionEnabled;
 
   @override
-  bool isEnabled(T intent) {
+  bool isEnabled(T intent, [BuildContext? context]) {
     return _control.isEnabled(intent);
   }
 

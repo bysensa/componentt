@@ -2,7 +2,7 @@
 
 * [FEAT] Implement ComponentAction API
 * [FEAT] Implement ComponentStateMixin API necessary to use ComponentActions
-* [FEAT] Implement extensions for BuildContext, ComponentAction and Component 
+* [FEAT] Implement extensions for BuildContext, ComponentAction and Component
   handler function
 
 ## 0.2.0
@@ -26,3 +26,9 @@
 * [REFACTORING] Rename ComponentMixin to ComponentStateMixin
 * [REFACTORING] Rename Component to ComponentState
 * [TEST] Improve test coverage
+
+## 0.5.0
+
+* [FIX] resolve problem with ContextAction API change
+* [FEAT] Add read() and listen() methods for scope BuildContext extension
+* [FEAT] Component now can be downcasted to any of implemented type
