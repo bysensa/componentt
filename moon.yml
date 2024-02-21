@@ -1,0 +1,48 @@
+type: library
+language: dart
+
+tags:
+  - 'dart'
+  - 'flutter'
+  - 'pub'
+
+project:
+  name: componentt
+  description: A library to simplify working with the intents, actions, and state of flutter widgets
+  maintainers: [ 'bysensa' ]
+
+
+platform: system
+
+tasks:
+  init:
+    command: 'flutter pub get'
+    inputs:
+      - 'pubspec.yaml'
+
+  lint:
+    command: 'flutter analyze --no-fatal-infos'
+    inputs:
+      - 'lib/**/*'
+    deps:
+      - 'init'
+
+  test:
+    command: 'flutter test'
+    inputs:
+      - 'lib/**/*'
+      - 'test/**/*'
+    deps:
+      - 'lint'
+
+  publish/check:
+    command: 'flutter pub publish --dry-run'
+    inputs:
+      - 'CHANGELOG.md'
+    deps:
+      - 'test'
+
+  publish/upload:
+    command: 'flutter pub publish'
+    deps:
+      - 'publish/check'
